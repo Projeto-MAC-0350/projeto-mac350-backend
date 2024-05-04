@@ -12,8 +12,19 @@ class Neo4jConnector(
 ) {
 
     private val driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))
-    
-    fun insert_connection(artist1 : Artist, artist2 : Artist) : Unit {
+
+    fun isArtistInDb(artist: Artist) : Boolean {
+        val result = driver.executableQuery(
+            "MATCH (a:Artist {name: \$name, id: \$id}) RETURN a")
+            .withParameters(mapOf(
+                "name" to artist.name,
+                "id" to artist.spotifyId,
+            )).withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+            .execute();
+        return result.records().isNotEmpty()
+    }
+
+    fun insertConnection(artist1 : Artist, artist2 : Artist) : Unit {
         driver.executableQuery(
             "MERGE (a1:Artist {name: \$a1, id: \$id1}) MERGE (a2:Artist {name: \$a2, id: \$id2}) MERGE (a1)-[:FEAT]->(a2)")
             .withParameters(mapOf(
@@ -25,7 +36,7 @@ class Neo4jConnector(
             .execute();
     }
 
-    fun get_path(artist1 : Artist, artist2 : Artist) : List<Artist> {
+    fun getPath(artist1 : Artist, artist2 : Artist) : List<Artist> {
         val results = driver.executableQuery(
             "MATCH (a1:Artist {name: \$a1, id: \$id1}),(a2:Artist {name: \$a2, id: \$id2}), p = shortestPath((a1)-[*]-(a2)) RETURN p;")
             .withParameters(mapOf(
