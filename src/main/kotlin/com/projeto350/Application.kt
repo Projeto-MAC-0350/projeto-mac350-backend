@@ -1,5 +1,7 @@
 package com.projeto350
 
+import com.projeto350.model.Artist
+import com.projeto350.neo4j.Neo4jConnector
 import com.projeto350.plugins.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
