@@ -1,13 +1,11 @@
 package com.projeto350
 
-import com.projeto350.model.Artist
-import com.projeto350.neo4j.Neo4jConnector
 import com.projeto350.plugins.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
-fun main() {
+suspend fun main() {
     embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
         .start(wait = true)
 }

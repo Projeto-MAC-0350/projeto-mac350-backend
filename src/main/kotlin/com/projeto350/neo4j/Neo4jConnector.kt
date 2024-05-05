@@ -24,6 +24,16 @@ class Neo4jConnector(
         return result.records().isNotEmpty()
     }
 
+    fun insertArtist(artist: Artist) {
+        driver.executableQuery(
+            "MERGE (artist:Artist {name: \$name, id: \$id})")
+            .withParameters(mapOf(
+                "name" to artist.name,
+                "id" to artist.spotifyId
+            )).withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+            .execute();
+    }
+
     fun insertConnection(artist1 : Artist, artist2 : Artist) : Unit {
         driver.executableQuery(
             "MERGE (a1:Artist {name: \$a1, id: \$id1}) MERGE (a2:Artist {name: \$a2, id: \$id2}) MERGE (a1)-[:FEAT]->(a2)")
