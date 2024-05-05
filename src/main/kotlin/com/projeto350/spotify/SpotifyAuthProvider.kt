@@ -32,7 +32,7 @@ class SpotifyAuthProvider {
             }
             setBody("grant_type=client_credentials&client_id=$clientId&client_secret=$clientSecret")
         }.body()
-        println(tokenResponse)
+
         return tokenResponse
     }
 }

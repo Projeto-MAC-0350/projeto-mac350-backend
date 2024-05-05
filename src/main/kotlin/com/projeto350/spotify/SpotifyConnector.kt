@@ -1,26 +1,20 @@
 package com.projeto350.spotify
 
-import ch.qos.logback.core.subst.Token
 import com.projeto350.model.Artist
-import io.github.cdimascio.dotenv.dotenv
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.kotlinx.serializer.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import io.ktor.util.*
 
 class SpotifyConnector {
 
     private val client : HttpClient = HttpClient(CIO) {
         defaultRequest {
-            url("https://ktor.io/docs/")
+            url("https://api.spotify.com/v1/")
         }
         install(ContentNegotiation) {
            json()
@@ -38,8 +32,13 @@ class SpotifyConnector {
                 }
             }
         }
+        install(HttpRequestRetry) {
+            retryOnServerErrors(maxRetries = retries)
+            exponentialDelay()
+        }
     }
 
+    private val retries = 20
     private lateinit var token : TokenInfo
     private val authProvider: SpotifyAuthProvider = SpotifyAuthProvider()
     /*
