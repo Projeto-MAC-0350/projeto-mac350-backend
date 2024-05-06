@@ -1,7 +1,7 @@
-package com.projeto350.spotify
+package com.projeto350.spotify.api
 
-import com.projeto350.model.Artist
 import com.projeto350.neo4j.Neo4jConnector
+import com.projeto350.spotify.model.Artist
 
 class SpotifyCrawler(
     private val spotifyConnector: SpotifyConnector = SpotifyConnector(),

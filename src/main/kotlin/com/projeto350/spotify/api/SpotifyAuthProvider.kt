@@ -1,5 +1,6 @@
-package com.projeto350.spotify
+package com.projeto350.spotify.api
 
+import com.projeto350.spotify.model.TokenInfo
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.client.*
 import io.ktor.client.call.*

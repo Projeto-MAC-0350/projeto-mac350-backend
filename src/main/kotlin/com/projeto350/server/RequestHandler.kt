@@ -2,7 +2,7 @@ package com.projeto350.server
 
 import com.google.gson.Gson
 import com.projeto350.neo4j.Neo4jConnector
-import com.projeto350.spotify.SpotifyConnector
+import com.projeto350.spotify.api.SpotifyConnector
 import io.ktor.http.*
 
 class RequestHandler (

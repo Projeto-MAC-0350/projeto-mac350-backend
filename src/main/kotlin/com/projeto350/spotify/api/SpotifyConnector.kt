@@ -1,12 +1,17 @@
-package com.projeto350.spotify
+package com.projeto350.spotify.api
 
-import com.projeto350.model.Artist
+import com.google.gson.JsonParser
+import com.projeto350.spotify.model.Album
+import com.projeto350.spotify.model.TokenInfo
+import com.projeto350.spotify.model.Artist
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.auth.*
 import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 
@@ -17,7 +22,7 @@ class SpotifyConnector {
             url("https://api.spotify.com/v1/")
         }
         install(ContentNegotiation) {
-           json()
+            json()
         }
         install(Auth) {
             bearer {
@@ -39,20 +44,37 @@ class SpotifyConnector {
     }
 
     private val retries = 20
+    private val authProvider = SpotifyAuthProvider()
+    private val converter = SpotifyResponseConverter()
     private lateinit var token : TokenInfo
-    private val authProvider: SpotifyAuthProvider = SpotifyAuthProvider()
     /*
-        Search for artists based on query, returns a list of artists spotifyUri
+        Search for artist based on query, returns the first artist sent by the spotify API
      */
-    fun searchArtists(query: String): List<String> {
-        return listOf()
+    suspend fun searchArtist(query: String): Artist {
+        val response : String = client.get("search/") {
+            url {
+                parameters.append("q", query)
+                parameters.append("type", "artist")
+                parameters.append("market", "US")
+                parameters.append("limit", "1")
+                parameters.append("offset", "0")
+            }
+        }.body()
+
+        return converter.getSearchResponseArtist(response)
     }
 
     /*
         Returns a list of spotify uri's, each representing an artist album
      */
-    fun getAlbums(artist: Artist): List<String> {
-        return listOf()
+    suspend fun getAlbums(artist: Artist): List<Album> {
+        val response : String = client.get("artists") {
+            url {
+                appendPathSegments(artist.id, "albums")
+            }
+        }.body()
+
+        return converter.getAlbumsFromJsonList(response)
     }
 
     /*
@@ -71,7 +93,12 @@ class SpotifyConnector {
     /*
         Return an artist given their spotify uri
      */
-    fun getArtistById(artistId: String): Artist {
-        return Artist("name", "id")
+    suspend fun getArtistById(artistId: String): Artist {
+        val response : String = client.get("artists") {
+            url {
+                appendPathSegments(artistId)
+            }
+        }.body()
+        return converter.getArtistFromJson(response)
     }
 }

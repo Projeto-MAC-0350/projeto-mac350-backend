@@ -1,4 +1,4 @@
-package com.projeto350.spotify
+package com.projeto350.spotify.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

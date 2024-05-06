@@ -1,6 +1,6 @@
 package com.projeto350.neo4j
 
-import com.projeto350.model.Artist
+import com.projeto350.spotify.model.Artist
 import org.neo4j.driver.AuthTokens
 import org.neo4j.driver.GraphDatabase
 import org.neo4j.driver.QueryConfig
@@ -18,7 +18,7 @@ class Neo4jConnector(
             "MATCH (a:Artist {name: \$name, id: \$id}) RETURN a")
             .withParameters(mapOf(
                 "name" to artist.name,
-                "id" to artist.spotifyId,
+                "id" to artist.id,
             )).withConfig(QueryConfig.builder().withDatabase("neo4j").build())
             .execute();
         return result.records().isNotEmpty()
@@ -29,7 +29,7 @@ class Neo4jConnector(
             "MERGE (artist:Artist {name: \$name, id: \$id})")
             .withParameters(mapOf(
                 "name" to artist.name,
-                "id" to artist.spotifyId
+                "id" to artist.id
             )).withConfig(QueryConfig.builder().withDatabase("neo4j").build())
             .execute();
     }
@@ -40,8 +40,8 @@ class Neo4jConnector(
             .withParameters(mapOf(
                 "a1" to artist1.name,
                 "a2" to artist2.name,
-                "id1" to artist1.spotifyId,
-                "id2" to artist2.spotifyId
+                "id1" to artist1.id,
+                "id2" to artist2.id
             )).withConfig(QueryConfig.builder().withDatabase("neo4j").build())
             .execute();
     }
@@ -52,13 +52,13 @@ class Neo4jConnector(
             .withParameters(mapOf(
                 "a1" to artist1.name,
                 "a2" to artist2.name,
-                "id1" to artist1.spotifyId,
-                "id2" to artist2.spotifyId
+                "id1" to artist1.id,
+                "id2" to artist2.id
             )).withConfig(QueryConfig.builder().withDatabase("neo4j").build())
             .execute();
 
         val records = results.records()[0]["p"].asPath().nodes()
-        val response = records.map { r -> Artist(r["name"].asString(), r["id"].asString()) }
+        val response = records.map { r -> Artist(name=r["name"].asString(), id=r["id"].asString()) }
         return response
     }
 
