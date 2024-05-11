@@ -10,7 +10,7 @@ fun Application.configureRouting() {
     routing {
         get("/path") {
             val response = handler.handleSpotifyPath(call.request.queryParameters)
-            call.respondBytes(response)
+            call.respond(response)
         }
     }
 }

@@ -4,6 +4,7 @@ import com.google.gson.JsonParser
 import com.projeto350.spotify.model.Album
 import com.projeto350.spotify.model.TokenInfo
 import com.projeto350.spotify.model.Artist
+import com.projeto350.spotify.model.Track
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
@@ -77,17 +78,41 @@ class SpotifyConnector {
         return converter.getAlbumsFromJsonList(response)
     }
 
+    suspend fun getAlbumTracks(album: Album): List<Track> {
+        val response : String = client.get("albums") {
+            url {
+                appendPathSegments(album.id, "tracks")
+                parameters.append("market", "US")
+                parameters.append("limit", "50")
+            }
+        }.body()
+
+        return converter.getTracksFromJson(response)
+    }
     /*
         Returns a list of spotify uri's, each representing an artist song
      */
-    fun getTracks(artist: Artist): List<String> {
-        return listOf()
+    suspend fun getTracks(artist: Artist): List<Track> {
+        val albums = getAlbums(artist)
+        val tracks: MutableList<Track> = mutableListOf()
+
+        albums.forEach {
+            album -> tracks.addAll(getAlbumTracks(album))
+        }
+
+        return tracks
     }
     /*
         Returns a list of Artist, each representing an artist the artist passed contributed
      */
-    fun getFeats(artist: Artist): List<Artist> {
-        return listOf()
+    suspend fun getFeats(artist: Artist): Set<Artist> {
+        val feats: MutableSet<Artist> = mutableSetOf()
+        val tracks = getTracks(artist)
+        tracks.forEach {
+            track -> feats.addAll(track.artists)
+        }
+
+        return feats
     }
 
     /*

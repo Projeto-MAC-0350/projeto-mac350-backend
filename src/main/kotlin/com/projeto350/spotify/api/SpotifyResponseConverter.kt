@@ -4,6 +4,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonParser
 import com.projeto350.spotify.model.Album
 import com.projeto350.spotify.model.Artist
+import com.projeto350.spotify.model.Track
 
 class SpotifyResponseConverter {
 
@@ -38,5 +39,25 @@ class SpotifyResponseConverter {
         }
 
         return Album(name, id, artists)
+    }
+
+    fun getTracksFromJson(response: String): List<Track> {
+        val json = JsonParser.parseString(response).asJsonObject
+        val tracks = json["items"].asJsonArray.map {
+                track -> getTrack(track.toString())
+        }
+
+        return tracks
+    }
+
+    fun getTrack(response: String): Track {
+        val json = JsonParser.parseString(response).asJsonObject
+        val id = json["id"].asString
+        val name = json["name"].asString
+        val artists = json["artists"].asJsonArray.map {
+            artist -> getArtistFromJson(artist.toString())
+        }
+
+        return Track(id, name, artists)
     }
 }
