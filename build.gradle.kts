@@ -40,5 +40,6 @@ dependencies {
     implementation("io.ktor:ktor-client-serialization:$ktor_version")
     implementation("com.github.dotenv-org:dotenv-vault-kotlin:0.0.2")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
 }

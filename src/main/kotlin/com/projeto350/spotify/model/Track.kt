@@ -1,7 +1,11 @@
 package com.projeto350.spotify.model
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
 class Track (
-    val name: String,
-    val id: String,
-    val artists: List<Artist>,
+    @SerialName("name") val name: String,
+    @SerialName("id") val id: String,
+    val artists: List<Artist> = listOf(),
 )

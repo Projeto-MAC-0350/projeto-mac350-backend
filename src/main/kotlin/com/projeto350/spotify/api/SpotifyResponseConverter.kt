@@ -1,7 +1,8 @@
 package com.projeto350.spotify.api
 
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
-import com.google.gson.JsonParser
+import com.google.gson.JsonObject
 import com.projeto350.spotify.model.Album
 import com.projeto350.spotify.model.Artist
 import com.projeto350.spotify.model.Image
@@ -9,13 +10,21 @@ import com.projeto350.spotify.model.Track
 
 class SpotifyResponseConverter {
 
-    fun getSearchResponseArtist(response: String): Artist {
-        val json = JsonParser.parseString(response).asJsonObject
-        return getArtistFromJson(json["artists"].asJsonObject["items"].asJsonArray[0].toString())
+    private val gson = GsonBuilder().create()
+
+    private fun getJsonObject(response: String): JsonObject {
+        val jsonObject = gson.fromJson(response, JsonObject::class.java)
+        return jsonObject.asJsonObject
+    }
+    fun getSearchResponseArtist(response: String): List<Artist> {
+        val json = getJsonObject(response)
+        return json["artists"].asJsonObject["items"].asJsonArray.map {
+            r -> getArtistFromJson(r.toString())
+        }
     }
 
     fun getArtistFromJson(response: String): Artist {
-        val json = JsonParser.parseString(response).asJsonObject
+        val json = getJsonObject(response)
         val name = json["name"].asString
         val id = json["id"].asString
         val popularity = json["popularity"]?.asInt
@@ -23,14 +32,14 @@ class SpotifyResponseConverter {
             val url = img.asJsonObject["url"].asString
             val height = img.asJsonObject["height"].asInt
             val width = img.asJsonObject["width"].asInt
-            Image(url, height, width)
+            return@map Image(url, height, width)
         }
     
         return Artist(name, id, popularity, images)
     }
 
     fun getAlbumsFromJsonList(response: String): List<Album> {
-        val json = JsonParser.parseString(response).asJsonObject
+        val json = getJsonObject(response)
         val albums = json["items"].asJsonArray.map {
             album -> getAlbumFromJson(album.toString())
         }
@@ -38,8 +47,8 @@ class SpotifyResponseConverter {
         return albums
     }
 
-    fun getAlbumFromJson(response: String): Album {
-        val json = JsonParser.parseString(response).asJsonObject
+    private fun getAlbumFromJson(response: String): Album {
+        val json = getJsonObject(response)
         val name = json["name"].asString
         val id = json["id"].asString
         val artists = json["artists"].asJsonArray.map {
@@ -50,22 +59,29 @@ class SpotifyResponseConverter {
     }
 
     fun getTracksFromJson(response: String): List<Track> {
-        val json = JsonParser.parseString(response).asJsonObject
-        val tracks = json["items"].asJsonArray.map {
-                track -> getTrack(track.toString())
+        val json = getJsonObject(response)
+        val tracks: MutableList<Track> = mutableListOf()
+        json["albums"].asJsonArray.forEach() {
+                r -> tracks.addAll(getTracks(r.asJsonObject["tracks"].asJsonObject["items"].asJsonArray))
         }
 
         return tracks
     }
 
-    fun getTrack(response: String): Track {
-        val json = JsonParser.parseString(response).asJsonObject
-        val id = json["id"].asString
-        val name = json["name"].asString
-        val artists = json["artists"].asJsonArray.map {
+    private fun getTracks(tracks: JsonArray): List<Track> {
+        return tracks.map {
+            track -> getTrack(track.asJsonObject)
+        }
+
+    }
+
+    private fun getTrack(track: JsonObject): Track {
+        val name = track["name"].asString
+        val id = track["id"].asString
+        val artists = track["artists"].asJsonArray.map {
             artist -> getArtistFromJson(artist.toString())
         }
 
-        return Track(id, name, artists)
+        return Track(name, id, artists)
     }
 }
