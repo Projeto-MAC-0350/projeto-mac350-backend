@@ -4,6 +4,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonParser
 import com.projeto350.spotify.model.Album
 import com.projeto350.spotify.model.Artist
+import com.projeto350.spotify.model.Image
 import com.projeto350.spotify.model.Track
 
 class SpotifyResponseConverter {
