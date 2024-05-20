@@ -50,7 +50,7 @@ class SpotifyConnector {
             retryIf { _, httpResponse -> httpResponse.status != HttpStatusCode.OK }
             exponentialDelay()
         }
-        install(Logging) { level = LogLevel.ALL }
+        install(Logging) { level = LogLevel.INFO }
     }
 
     val mutex = Mutex()
@@ -168,7 +168,10 @@ class SpotifyConnector {
         val feats: MutableSet<Feat> = mutableSetOf()
         val tracks = getTracks(artist)
         tracks.forEach {
-            track -> feats.addAll(track.artists.map { artist -> Feat(artist, track) })
+            track ->
+            if (track.artists.size > 1 && track.artists.find { a -> a.id ==  artist.id} != null) {
+                feats.addAll(track.artists.map { artist -> Feat(artist, track) })
+            }
         }
 
         return feats
