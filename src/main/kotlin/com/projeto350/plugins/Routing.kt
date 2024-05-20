@@ -16,7 +16,6 @@ fun Application.configureRouting() {
     val handler: RequestHandler = RequestHandler()
     routing {
         get("/path") {
-            println(call.request.queryParameters)
             val response = handler.handleSpotifyPath(call.request.queryParameters)
             call.respond(response)
         }

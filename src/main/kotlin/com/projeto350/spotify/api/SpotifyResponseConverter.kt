@@ -28,11 +28,11 @@ class SpotifyResponseConverter {
         val name = json["name"].asString
         val id = json["id"].asString
         val popularity = json["popularity"]?.asInt
-        val images = json["images"].asJsonArray.map { img ->
-            val url = img.asJsonObject["url"].asString
-            val height = img.asJsonObject["height"].asInt
-            val width = img.asJsonObject["width"].asInt
-            return@map Image(url, height, width)
+        val images: List<Image>? = json["images"]?.asJsonArray?.map { img ->
+            val imageUrl = img.asJsonObject["url"].asString
+            val imageHeight = img.asJsonObject["height"].asInt
+            val imageWidth = img.asJsonObject["width"].asInt
+            Image(imageUrl, imageHeight, imageWidth)  
         }
     
         return Artist(name, id, popularity, images)
