@@ -37,6 +37,7 @@ dependencies {
     implementation("io.ktor:ktor-client-logging:$ktor_version")
     implementation("io.ktor:ktor-client-auth:$ktor_version")
     implementation("io.ktor:ktor-client-json:$ktor_version")
+    implementation("io.ktor:ktor-server-cors:$ktor_version")
     implementation("io.ktor:ktor-client-serialization:$ktor_version")
     implementation("com.github.dotenv-org:dotenv-vault-kotlin:0.0.2")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")

@@ -6,10 +6,14 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.plugins.cors.routing.*
 
 fun Application.configureContentNegotiation() {
     install(ContentNegotiation) {
         json()
+    }
+    install(CORS) {
+        anyHost()
     }
 }
 fun Application.configureRouting() {
