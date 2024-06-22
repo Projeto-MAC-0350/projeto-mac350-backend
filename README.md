@@ -32,3 +32,11 @@ CLIENTSECRET=clientsecret
 ```
 
 Entre em contato com o filipe para pegar essas chaves.
+
+## Como executar os testes
+
+Para executar os testes, basta executar o seguinte comando:
+
+```
+./gradlew test
+```
