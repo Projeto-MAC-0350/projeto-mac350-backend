@@ -17,10 +17,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-object SpotifyConnector {
-
-    private var authProvider: SpotifyAuthProvider = SpotifyAuthProvider()
-    private var converter : SpotifyResponseConverter = SpotifyResponseConverter()
+class SpotifyConnector(
+    private val authProvider: SpotifyAuthProvider = SpotifyAuthProvider(),
+    private val converter : SpotifyResponseConverter = SpotifyResponseConverter(),
+) {
 
     private val client : HttpClient = HttpClient(CIO) {
         defaultRequest {
@@ -61,6 +61,16 @@ object SpotifyConnector {
                     execute(request)
                 }
         }
+    }
+
+    companion object {
+
+        @Volatile private var instance: SpotifyConnector? = null
+
+        fun getInstance() =
+            instance ?: synchronized(this) {
+                instance ?: SpotifyConnector().also { instance = it }
+            }
     }
     /*
         Search for artist based on query, returns the first artist sent by the spotify API
@@ -126,7 +136,7 @@ object SpotifyConnector {
     /*
             Returns a list of spotify uri's, each representing an artist album
          */
-    suspend fun getAlbums(artist: Artist): List<Album> {
+    private suspend fun getAlbums(artist: Artist): List<Album> {
         val albums: MutableList<Album> = mutableListOf()
         var partialAlbums: List<Album>
         var processed = 0

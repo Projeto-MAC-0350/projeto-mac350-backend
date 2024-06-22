@@ -5,7 +5,8 @@ import com.projeto350.spotify.model.Artist
 import java.util.*
 
 class SpotifyCrawler(
-    private val neo4jConnector: Neo4jConnector = Neo4jConnector()
+    private val neo4jConnector: Neo4jConnector = Neo4jConnector(),
+    private val spotifyConnector: SpotifyConnector = SpotifyConnector.getInstance()
 ) {
 
     suspend fun crawlArtistConnections(artist: Artist) {
@@ -18,7 +19,7 @@ class SpotifyCrawler(
             println("queue has: ${queue.count()} artists")
             try {
                 val currentArtist = queue.remove()
-                val feats = SpotifyConnector.getFeats(currentArtist)
+                val feats = spotifyConnector.getFeats(currentArtist)
 
                 feats.forEach {
                     if (!finished.contains(it.artist)) {
@@ -28,8 +29,7 @@ class SpotifyCrawler(
                     neo4jConnector.insertConnection(currentArtist, it.artist, it.track)
                 }
             } catch(error: Throwable) {
-                println("An error occurred while crawling for artist ${artist}: $error")
-                error.printStackTrace()
+                throw RuntimeException("An error occurred while crawling for artist ${artist}: $error")
             }
         }
     }
