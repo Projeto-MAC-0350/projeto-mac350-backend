@@ -5,7 +5,6 @@ import com.projeto350.spotify.model.Artist
 import java.util.*
 
 class SpotifyCrawler(
-    private val spotifyConnector: SpotifyConnector = SpotifyConnector(),
     private val neo4jConnector: Neo4jConnector = Neo4jConnector()
 ) {
 
@@ -13,13 +12,13 @@ class SpotifyCrawler(
         val queue: Queue<Artist> = LinkedList()
         val finished: MutableSet<Artist> = mutableSetOf()
         queue.add(artist)
+        finished.add(artist)
         neo4jConnector.insertArtist(artist)
         while (queue.isNotEmpty()){
             println("queue has: ${queue.count()} artists")
             try {
                 val currentArtist = queue.remove()
-                finished.add(currentArtist)
-                val feats = spotifyConnector.getFeats(currentArtist)
+                val feats = SpotifyConnector.getFeats(currentArtist)
 
                 feats.forEach {
                     if (!finished.contains(it.artist)) {
